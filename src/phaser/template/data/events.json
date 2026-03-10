@@ -1,0 +1,84 @@
+{
+  "scenes": [
+    {
+      "sceneId": "village",
+      "npcs": [
+        {
+          "id": "guide",
+          "name": "Li Wei",
+          "x": 10,
+          "y": 7,
+          "spriteColor": "#e6a23c",
+          "dialogue": [
+            { "speaker": "Li Wei", "text": "你好！欢迎来到我们的村庄！" },
+            { "speaker": "Li Wei", "text": "Welcome to our village!" },
+            { "speaker": "Li Wei", "text": "Head east to the classroom to start learning." },
+            { "speaker": "Li Wei", "text": "往东走到教室去学习吧！" }
+          ],
+          "challenge": null
+        }
+      ],
+      "transfers": [
+        {
+          "id": "to_classroom",
+          "x": 17,
+          "y": 4,
+          "width": 1,
+          "height": 1,
+          "targetScene": "classroom",
+          "targetX": 5,
+          "targetY": 8
+        }
+      ]
+    },
+    {
+      "sceneId": "classroom",
+      "npcs": [
+        {
+          "id": "teacher",
+          "name": "Wang Laoshi",
+          "x": 5,
+          "y": 2,
+          "spriteColor": "#f56c6c",
+          "dialogue": [
+            { "speaker": "Wang Laoshi", "text": "欢迎来到教室！" },
+            { "speaker": "Wang Laoshi", "text": "Welcome to the classroom!" },
+            { "speaker": "Wang Laoshi", "text": "Let me test your Chinese knowledge..." }
+          ],
+          "challenge": {
+            "type": "vocab_choice",
+            "vocabIds": ["v1", "v2", "v3"]
+          }
+        },
+        {
+          "id": "student",
+          "name": "Xiao Ming",
+          "x": 3,
+          "y": 5,
+          "spriteColor": "#67c23a",
+          "dialogue": [
+            { "speaker": "Xiao Ming", "text": "嗨！我也在学习！" },
+            { "speaker": "Xiao Ming", "text": "Hi! I'm learning too!" },
+            { "speaker": "Xiao Ming", "text": "This sentence ordering is tricky..." }
+          ],
+          "challenge": {
+            "type": "sentence_order",
+            "vocabIds": ["v4"]
+          }
+        }
+      ],
+      "transfers": [
+        {
+          "id": "to_village",
+          "x": 5,
+          "y": 9,
+          "width": 2,
+          "height": 1,
+          "targetScene": "village",
+          "targetX": 17,
+          "targetY": 5
+        }
+      ]
+    }
+  ]
+}

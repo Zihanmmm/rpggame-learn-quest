@@ -1,6 +1,7 @@
 node_modules/
 .next/
 data/
+!src/phaser/template/data/
 generated/
 .env
 *.db

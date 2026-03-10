@@ -1,0 +1,8 @@
+{
+  "title": "Chinese Village Adventure",
+  "subtitle": "Learn basic Chinese through exploration",
+  "targetLanguage": "Chinese",
+  "nativeLanguage": "English",
+  "tileSize": 32,
+  "playerSprite": "player"
+}

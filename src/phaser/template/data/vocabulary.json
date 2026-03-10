@@ -1,0 +1,41 @@
+{
+  "vocabulary": [
+    {
+      "id": "v1",
+      "term": "你好",
+      "translation": "Hello",
+      "pinyin": "nǐ hǎo",
+      "context": "A common greeting used when meeting someone",
+      "difficulty": 1,
+      "distractors": ["Goodbye", "Thank you", "Sorry"]
+    },
+    {
+      "id": "v2",
+      "term": "谢谢",
+      "translation": "Thank you",
+      "pinyin": "xiè xie",
+      "context": "Used to express gratitude",
+      "difficulty": 1,
+      "distractors": ["Hello", "Sorry", "Please"]
+    },
+    {
+      "id": "v3",
+      "term": "老师",
+      "translation": "Teacher",
+      "pinyin": "lǎo shī",
+      "context": "A respectful term for a teacher or instructor",
+      "difficulty": 1,
+      "distractors": ["Student", "Friend", "Parent"]
+    },
+    {
+      "id": "v4",
+      "term": "我是学生",
+      "translation": "I am a student",
+      "pinyin": "wǒ shì xué shēng",
+      "context": "A basic self-introduction sentence",
+      "difficulty": 2,
+      "segments": ["我", "是", "学生"],
+      "segmentTranslations": ["I", "am", "a student"]
+    }
+  ]
+}
