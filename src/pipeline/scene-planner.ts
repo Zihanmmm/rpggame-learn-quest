@@ -1,18 +1,18 @@
 import { chatCompletionStream, type LlmCallContext } from "@/llm/client";
 import { TextAnalysis, GameDesign, ScenePlan, SectionContext } from "@/pipeline/types";
 
-export const SYSTEM_PROMPT = `You are an RPG scene planner. Plan the map scenes for an RPG Maker MZ game based on the literary analysis and game design.
+export const SYSTEM_PROMPT = `You are an RPG scene planner. Plan the map scenes for a Phaser browser RPG based on the literary analysis and game design.
 
 You MUST output all human-readable text values in Chinese (中文), including scene names, descriptions, atmosphere, mapTemplateHint, connection descriptions, etc. Only IDs and technical fields stay in English.
 
-Create 5-10 map scenes. Each scene is a distinct map the player can visit.
+Create 3-8 map scenes. Each scene is a distinct tile-based map the player can visit.
 
 For each scene provide:
 - id: unique scene ID like "scene_01"
 - name: display name for the map
 - description: what this place is
 - type: "indoor" or "outdoor"
-- size: "small" (17x13), "medium" (25x19), or "large" (33x25)
+- size: "small" (15x12 tiles), "medium" (20x15 tiles), or "large" (25x18 tiles)
 - timeOfDay: "morning", "afternoon", "evening", or "night"
 - atmosphere: the mood/feeling of this scene
 - mapTemplateHint: describe what kind of map template to use, e.g. "tavern interior", "town street", "forest clearing", "mansion room", "castle hall", "village square", "cave entrance"
