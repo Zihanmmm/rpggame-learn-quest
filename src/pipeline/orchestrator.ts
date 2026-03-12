@@ -4,7 +4,7 @@ import type {
   GameDesign,
   ScenePlan,
   SceneDetail,
-  AssetMapping,
+  PhaserAssetMapping,
   SectionContext,
   BookSection,
 } from "@/pipeline/types";
@@ -12,8 +12,8 @@ import { analyzeText } from "@/pipeline/text-analyzer";
 import { designGame } from "@/pipeline/game-designer";
 import { planScenes } from "@/pipeline/scene-planner";
 import { buildScenes } from "@/pipeline/scene-builder";
-import { mapAssets } from "@/pipeline/asset-mapper";
-import { adaptToRPGMaker } from "@/pipeline/rpgmaker-adapter";
+import { mapPhaserAssets } from "@/pipeline/phaser-asset-mapper";
+import { adaptToPhaser } from "@/pipeline/phaser-adapter";
 import { splitSections } from "@/pipeline/section-splitter";
 import { getStagePrompt } from "@/pipeline/prompts";
 import {
@@ -87,12 +87,12 @@ function nextStageBook(currentKey: string, sections: BookSection[]): string {
       // Start next section
       return stageKey("game_design", sectionIndex + 1);
     }
-    // All sections done → asset_mapping
-    return "asset_mapping";
+    // All sections done → phaser_asset_mapper
+    return "phaser_asset_mapper";
   }
 
-  if (baseStage === "asset_mapping") return "rpgmaker_adapter";
-  if (baseStage === "rpgmaker_adapter") return "complete";
+  if (baseStage === "phaser_asset_mapper") return "phaser_adapter";
+  if (baseStage === "phaser_adapter") return "complete";
 
   return "complete";
 }
@@ -212,29 +212,34 @@ export async function runStep(
         }
         break;
       }
-      case "asset_mapping": {
+      case "phaser_asset_mapper": {
         const analysis = loadStepJson<TextAnalysis>(projectId, "text_analysis");
         if (isBook) {
-          // Merge all section scene plans into one
           const sections = getSections(projectId);
           const mergedPlan = mergeScenePlans(projectId, sections);
-          result = await mapAssets(analysis, mergedPlan, ctx);
+          const mergedDetails = mergeAllSceneDetails(projectId, sections);
+          onToken?.("\n生成 Phaser 地图数据...\n");
+          result = mapPhaserAssets(analysis, mergedPlan, mergedDetails);
         } else {
           const plan = loadStepJson<ScenePlan>(projectId, "scene_planning");
-          result = await mapAssets(analysis, plan, ctx);
+          const sceneDetails = loadStepJson<SceneDetail[]>(projectId, "scene_building");
+          onToken?.("\n生成 Phaser 地图数据...\n");
+          result = mapPhaserAssets(analysis, plan, sceneDetails);
         }
         break;
       }
-      case "rpgmaker_adapter": {
+      case "phaser_adapter": {
         const textAnalysis = loadStepJson<TextAnalysis>(projectId, "text_analysis");
-        const assetMapping = loadStepJson<AssetMapping>(projectId, "asset_mapping");
+        const assetMapping = loadStepJson<PhaserAssetMapping>(projectId, "phaser_asset_mapper");
 
         if (isBook) {
           const sections = getSections(projectId);
           const { gameDesign, scenePlan, sceneDetails } = mergeAllSectionData(projectId, sections);
 
-          onToken?.("\nGenerating RPG Maker MZ project files (book mode)...\n");
-          const outputPath = await adaptToRPGMaker({
+          onToken?.("\n生成 Phaser 游戏工程...\n");
+          const outputPath = await adaptToPhaser({
+            projectId,
+            projectName: project.name,
             textAnalysis,
             gameDesign,
             scenePlan,
@@ -248,8 +253,10 @@ export async function runStep(
           const scenePlan = loadStepJson<ScenePlan>(projectId, "scene_planning");
           const sceneDetails = loadStepJson<SceneDetail[]>(projectId, "scene_building");
 
-          onToken?.("\nGenerating RPG Maker MZ project files...\n");
-          const outputPath = await adaptToRPGMaker({
+          onToken?.("\n生成 Phaser 游戏工程...\n");
+          const outputPath = await adaptToPhaser({
+            projectId,
+            projectName: project.name,
             textAnalysis,
             gameDesign,
             scenePlan,
@@ -339,7 +346,28 @@ function prefixScenePlan(plan: ScenePlan, sectionIndex: number): ScenePlan {
   };
 }
 
-/** Merge all section data for rpgmaker_adapter */
+/** Merge all section SceneDetails into one array */
+function mergeAllSceneDetails(projectId: string, sections: BookSection[]): SceneDetail[] {
+  const allDetails: SceneDetail[] = [];
+  for (let i = 0; i < sections.length; i++) {
+    const details = loadStepJson<SceneDetail[]>(projectId, stageKey("scene_building", i));
+    const prefix = `s${i}_`;
+    allDetails.push(...details.map(d => ({
+      ...d,
+      sceneId: prefix + d.sceneId,
+      events: d.events.map(evt => ({
+        ...evt,
+        transfer: evt.transfer ? {
+          ...evt.transfer,
+          targetSceneId: prefix + evt.transfer.targetSceneId,
+        } : undefined,
+      })),
+    })));
+  }
+  return allDetails;
+}
+
+/** Merge all section data for phaser_adapter */
 function mergeAllSectionData(projectId: string, sections: BookSection[]) {
   const allAnchorEvents: GameDesign["anchorEvents"] = [];
   const allDecisionNodes: GameDesign["decisionNodes"] = [];
@@ -414,8 +442,8 @@ const STAGE_DEPS: Record<string, PipelineStage[]> = {
   game_design: ["text_analysis"],
   scene_planning: ["text_analysis", "game_design"],
   scene_building: ["text_analysis", "game_design", "scene_planning"],
-  asset_mapping: ["text_analysis", "scene_planning"],
-  rpgmaker_adapter: ["text_analysis", "game_design", "scene_planning", "scene_building", "asset_mapping"],
+  phaser_asset_mapper: ["text_analysis", "scene_planning", "scene_building"],
+  phaser_adapter: ["text_analysis", "game_design", "scene_planning", "scene_building", "phaser_asset_mapper"],
 };
 
 const STAGE_LABELS: Record<string, string> = {
@@ -424,8 +452,8 @@ const STAGE_LABELS: Record<string, string> = {
   game_design: "游戏设计",
   scene_planning: "场景规划",
   scene_building: "场景构建",
-  asset_mapping: "素材映射",
-  rpgmaker_adapter: "工程生成",
+  phaser_asset_mapper: "地图生成",
+  phaser_adapter: "工程生成",
 };
 
 export async function syncStep(
@@ -436,7 +464,7 @@ export async function syncStep(
   const { baseStage } = parseStageKey(stage);
 
   // Deterministic or no-upstream stages: just re-run
-  if (baseStage === "rpgmaker_adapter" || baseStage === "text_analysis" || baseStage === "section_splitting") {
+  if (baseStage === "phaser_adapter" || baseStage === "phaser_asset_mapper" || baseStage === "text_analysis" || baseStage === "section_splitting") {
     return runStep(projectId, stage, onToken);
   }
 
@@ -525,6 +553,6 @@ export function getBookStageOrder(sections: BookSection[]): string[] {
     stages.push(stageKey("scene_planning", i));
     stages.push(stageKey("scene_building", i));
   }
-  stages.push("asset_mapping", "rpgmaker_adapter");
+  stages.push("phaser_asset_mapper", "phaser_adapter");
   return stages;
 }

@@ -171,9 +171,9 @@ function StructuredView({ stage, data, allSteps, projectId, onProjectReload, onS
       return <ScenePlanView data={obj} {...h} />;
     case "scene_building":
       return <SceneBuildingView data={data as unknown[]} allSteps={allSteps} {...h} />;
-    case "asset_mapping":
+    case "phaser_asset_mapper":
       return <AssetMappingView data={obj} allSteps={allSteps} projectId={projectId} onProjectReload={onProjectReload} onSave={onSave} {...h} />;
-    case "rpgmaker_adapter":
+    case "phaser_adapter":
       return <AdapterView data={obj} />;
     default:
       return <JsonFallback data={data} />;

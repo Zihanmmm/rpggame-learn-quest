@@ -9,8 +9,8 @@ const STAGE_ORDER: PipelineStage[] = [
   "game_design",
   "scene_planning",
   "scene_building",
-  "asset_mapping",
-  "rpgmaker_adapter",
+  "phaser_asset_mapper",
+  "phaser_adapter",
 ];
 
 function stageIndex(stage: PipelineStage): number {

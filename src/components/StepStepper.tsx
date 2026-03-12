@@ -11,8 +11,8 @@ const ARTICLE_STAGES: StageInfo[] = [
   { key: "game_design", label: "游戏设计" },
   { key: "scene_planning", label: "场景规划" },
   { key: "scene_building", label: "场景构建" },
-  { key: "asset_mapping", label: "素材映射" },
-  { key: "rpgmaker_adapter", label: "工程生成" },
+  { key: "phaser_asset_mapper", label: "地图生成" },
+  { key: "phaser_adapter", label: "工程生成" },
 ];
 
 // For backward compatibility
@@ -41,8 +41,8 @@ export function buildBookStages(sections: BookSectionMeta[]): StageInfo[] {
     );
   }
   stages.push(
-    { key: "asset_mapping", label: "素材映射" },
-    { key: "rpgmaker_adapter", label: "工程生成" },
+    { key: "phaser_asset_mapper", label: "地图生成" },
+    { key: "phaser_adapter", label: "工程生成" },
   );
   return stages;
 }

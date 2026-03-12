@@ -226,6 +226,29 @@ export interface AssetMapping {
   scenes: SceneAsset[];
 }
 
+// ---- Phaser Asset Mapper Output (Stage 6) ----
+
+export interface PhaserCharacterAsset {
+  characterId: string;
+  name: string;
+  spriteColor: string; // hex color
+}
+
+export interface PhaserMapData {
+  sceneId: string;
+  name: string;
+  width: number;
+  height: number;
+  ground: number[][];   // 0=grass,1=path,2=wall,3=water,4=floor,5=door
+  collision: number[][]; // 0=walkable, 1=blocked
+  playerSpawn: { x: number; y: number };
+}
+
+export interface PhaserAssetMapping {
+  characters: PhaserCharacterAsset[];
+  maps: PhaserMapData[];
+}
+
 // ---- Pipeline State ----
 
 export type PipelineStage =
@@ -234,8 +257,8 @@ export type PipelineStage =
   | "game_design"
   | "scene_planning"
   | "scene_building"
-  | "asset_mapping"
-  | "rpgmaker_adapter"
+  | "phaser_asset_mapper"
+  | "phaser_adapter"
   | "complete"
   | "error";
 
@@ -245,8 +268,8 @@ export const PIPELINE_STAGES: PipelineStage[] = [
   "game_design",
   "scene_planning",
   "scene_building",
-  "asset_mapping",
-  "rpgmaker_adapter",
+  "phaser_asset_mapper",
+  "phaser_adapter",
 ];
 
 export const STAGE_LABELS: Record<PipelineStage, string> = {
@@ -255,8 +278,8 @@ export const STAGE_LABELS: Record<PipelineStage, string> = {
   game_design: "游戏设计",
   scene_planning: "场景规划",
   scene_building: "场景构建",
-  asset_mapping: "素材映射",
-  rpgmaker_adapter: "工程生成",
+  phaser_asset_mapper: "地图生成",
+  phaser_adapter: "工程生成",
   complete: "完成",
   error: "出错",
 };

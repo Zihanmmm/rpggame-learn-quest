@@ -19,8 +19,8 @@ const STAGE_LABELS: Record<string, string> = {
   game_design: "游戏设计",
   scene_planning: "场景规划",
   scene_building: "场景构建",
-  asset_mapping: "素材映射",
-  rpgmaker_adapter: "工程生成",
+  phaser_asset_mapper: "地图生成",
+  phaser_adapter: "工程生成",
   complete: "已完成",
   error: "出错",
 };

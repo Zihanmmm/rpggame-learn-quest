@@ -98,8 +98,8 @@ export default function ProjectPage() {
       return [
         { key: "section_splitting", label: "章节拆分" },
         { key: "text_analysis", label: "文本分析" },
-        { key: "asset_mapping", label: "素材映射" },
-        { key: "rpgmaker_adapter", label: "工程生成" },
+        { key: "phaser_asset_mapper", label: "地图生成" },
+        { key: "phaser_adapter", label: "工程生成" },
       ];
     }
     try {
@@ -326,7 +326,7 @@ export default function ProjectPage() {
     if (running || !project) return;
     if (!confirm("确认重新生成工程？将回退最后一步并重新构建。")) return;
 
-    const adapterStage = "rpgmaker_adapter";
+    const adapterStage = "phaser_adapter";
     await fetch(`/api/projects/${id}/rollback`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
