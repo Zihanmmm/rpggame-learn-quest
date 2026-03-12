@@ -125,7 +125,7 @@ export class MapScene extends Phaser.Scene {
       const sprite = this.add.image(
         npc.x * this.tileSize + this.tileSize / 2,
         npc.y * this.tileSize + this.tileSize / 2,
-        `npc_${npc.id}`
+        `npc_${this.mapId}_${npc.id}`
       ).setDepth(5);
 
       this.add.text(

@@ -114,7 +114,8 @@ export class BootScene extends Phaser.Scene {
     const events = this.registry.get('events');
     for (const scene of events.scenes) {
       for (const npc of scene.npcs) {
-        const key = `npc_${npc.id}`;
+        const key = `npc_${scene.sceneId}_${npc.id}`;
+        if (this.textures.exists(key)) continue;
         const canvas = this.textures.createCanvas(key, size, size);
         const ctx = canvas.context;
         const half = size / 2;

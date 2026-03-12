@@ -60,7 +60,19 @@ function buildConfig(input: PhaserAdapterInput) {
 }
 
 function buildMaps(assetMapping: PhaserAssetMapping) {
-  return { maps: assetMapping.maps };
+  return {
+    maps: assetMapping.maps.map((m) => ({
+      id: m.sceneId,
+      name: m.name,
+      width: m.width,
+      height: m.height,
+      layers: {
+        ground: m.ground,
+        collision: m.collision,
+      },
+      playerSpawn: m.playerSpawn,
+    })),
+  };
 }
 
 function buildEvents(input: PhaserAdapterInput) {
