@@ -6,13 +6,8 @@ import {
   SceneMeta,
   SceneDetail,
   SectionContext,
+  SCENE_SIZE_DIMENSIONS,
 } from "@/pipeline/types";
-
-const SCENE_SIZE_DIMENSIONS: Record<string, { w: number; h: number }> = {
-  small: { w: 15, h: 12 },
-  medium: { w: 20, h: 15 },
-  large: { w: 25, h: 18 },
-};
 
 function buildSystemPrompt(scene: SceneMeta, isFirstScene: boolean): string {
   const dims = SCENE_SIZE_DIMENSIONS[scene.size] ?? { w: 17, h: 13 };

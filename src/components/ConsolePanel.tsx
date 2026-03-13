@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { STAGE_LABELS } from "@/pipeline/types";
 
 interface LlmLog {
   id: number;
@@ -72,15 +73,6 @@ export default function ConsolePanel({
       loadLogs();
     }
   }, [streamText, loadLogs]);
-
-  const STAGE_LABELS: Record<string, string> = {
-    text_analysis: "文本分析",
-    game_design: "游戏设计",
-    scene_planning: "场景规划",
-    scene_building: "场景构建",
-    phaser_asset_mapper: "地图生成",
-    phaser_adapter: "工程生成",
-  };
 
   return (
     <div

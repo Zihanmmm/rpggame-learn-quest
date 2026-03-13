@@ -1,12 +1,13 @@
-import type {
-  PipelineStage,
-  TextAnalysis,
-  GameDesign,
-  ScenePlan,
-  SceneDetail,
-  PhaserAssetMapping,
-  SectionContext,
-  BookSection,
+import {
+  type PipelineStage,
+  type TextAnalysis,
+  type GameDesign,
+  type ScenePlan,
+  type SceneDetail,
+  type PhaserAssetMapping,
+  type SectionContext,
+  type BookSection,
+  STAGE_LABELS,
 } from "@/pipeline/types";
 import { analyzeText } from "@/pipeline/text-analyzer";
 import { designGame } from "@/pipeline/game-designer";
@@ -234,23 +235,19 @@ export async function runStep(
 
         if (isBook) {
           const sections = getSections(projectId);
-          const { gameDesign, scenePlan, sceneDetails } = mergeAllSectionData(projectId, sections);
+          const { sceneDetails } = mergeAllSectionData(projectId, sections);
 
           onToken?.("\n生成 Phaser 游戏工程...\n");
           const outputPath = await adaptToPhaser({
             projectId,
             projectName: project.name,
             textAnalysis,
-            gameDesign,
-            scenePlan,
             sceneDetails,
             assetMapping,
           });
           result = { outputPath };
           updateProject(projectId, { output_path: outputPath });
         } else {
-          const gameDesign = loadStepJson<GameDesign>(projectId, "game_design");
-          const scenePlan = loadStepJson<ScenePlan>(projectId, "scene_planning");
           const sceneDetails = loadStepJson<SceneDetail[]>(projectId, "scene_building");
 
           onToken?.("\n生成 Phaser 游戏工程...\n");
@@ -258,8 +255,6 @@ export async function runStep(
             projectId,
             projectName: project.name,
             textAnalysis,
-            gameDesign,
-            scenePlan,
             sceneDetails,
             assetMapping,
           });
@@ -444,16 +439,6 @@ const STAGE_DEPS: Record<string, PipelineStage[]> = {
   scene_building: ["text_analysis", "game_design", "scene_planning"],
   phaser_asset_mapper: ["text_analysis", "scene_planning", "scene_building"],
   phaser_adapter: ["text_analysis", "game_design", "scene_planning", "scene_building", "phaser_asset_mapper"],
-};
-
-const STAGE_LABELS: Record<string, string> = {
-  section_splitting: "章节拆分",
-  text_analysis: "文本分析",
-  game_design: "游戏设计",
-  scene_planning: "场景规划",
-  scene_building: "场景构建",
-  phaser_asset_mapper: "地图生成",
-  phaser_adapter: "工程生成",
 };
 
 export async function syncStep(

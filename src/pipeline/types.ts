@@ -190,41 +190,13 @@ export interface SceneDetail {
   screenTone?: [number, number, number, number];
 }
 
-// ---- Module 5: Asset Mapper Output ----
+// ---- Scene Size Dimensions ----
 
-export interface CharacterAsset {
-  characterId: string;
-  characterName: string;
-  characterImage: string;
-  characterIndex: number;
-  faceImage: string;
-  faceIndex: number;
-}
-
-export interface MapMarker {
-  id: string;
-  type: "exit" | "spawn" | "npc" | "area_trigger" | "autorun";
-  x: number;
-  y: number;
-  label?: string;
-  targetSceneId?: string;
-  characterId?: string;
-  direction?: 2 | 4 | 6 | 8;
-}
-
-export interface SceneAsset {
-  sceneId: string;
-  tilesetId: number;
-  sampleMapId?: number;
-  bgm: { name: string; volume: number; pitch: number; pan: number };
-  bgs?: { name: string; volume: number; pitch: number; pan: number };
-  markers?: MapMarker[];
-}
-
-export interface AssetMapping {
-  characters: CharacterAsset[];
-  scenes: SceneAsset[];
-}
+export const SCENE_SIZE_DIMENSIONS: Record<string, { w: number; h: number }> = {
+  small: { w: 15, h: 12 },
+  medium: { w: 20, h: 15 },
+  large: { w: 25, h: 18 },
+};
 
 // ---- Phaser Asset Mapper Output (Stage 6) ----
 
@@ -272,7 +244,7 @@ export const PIPELINE_STAGES: PipelineStage[] = [
   "phaser_adapter",
 ];
 
-export const STAGE_LABELS: Record<PipelineStage, string> = {
+export const STAGE_LABELS: Record<string, string> = {
   section_splitting: "章节拆分",
   text_analysis: "文本分析",
   game_design: "游戏设计",

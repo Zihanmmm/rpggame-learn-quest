@@ -2,8 +2,6 @@ import * as fs from "fs";
 import * as path from "path";
 import type {
   TextAnalysis,
-  GameDesign,
-  ScenePlan,
   SceneDetail,
   PhaserAssetMapping,
 } from "@/pipeline/types";
@@ -14,8 +12,6 @@ export interface PhaserAdapterInput {
   projectId: string;
   projectName: string;
   textAnalysis: TextAnalysis;
-  gameDesign: GameDesign;
-  scenePlan: ScenePlan;
   sceneDetails: SceneDetail[];
   assetMapping: PhaserAssetMapping;
 }
@@ -38,7 +34,7 @@ export async function adaptToPhaser(input: PhaserAdapterInput): Promise<string> 
   const configJson = buildConfig(input);
   const mapsJson = buildMaps(input.assetMapping);
   const eventsJson = buildEvents(input);
-  const vocabularyJson = buildVocabulary(input.textAnalysis);
+  const vocabularyJson = buildVocabulary();
 
   fs.writeFileSync(path.join(dataDir, "config.json"), JSON.stringify(configJson, null, 2));
   fs.writeFileSync(path.join(dataDir, "maps.json"), JSON.stringify(mapsJson, null, 2));
@@ -78,6 +74,13 @@ function buildMaps(assetMapping: PhaserAssetMapping) {
 function buildEvents(input: PhaserAdapterInput) {
   const { sceneDetails, textAnalysis, assetMapping } = input;
 
+  // Build lookup maps to avoid O(n) find() per event
+  const nameById = new Map(textAnalysis.characters.map((c) => [c.id, c.name]));
+  const colorById = new Map(assetMapping.characters.map((c) => [c.characterId, c.spriteColor]));
+
+  const charName = (id?: string) => (id && nameById.get(id)) ?? id ?? "???";
+  const charColor = (id?: string) => (id && colorById.get(id)) ?? "#999999";
+
   return {
     scenes: sceneDetails.map((sd) => ({
       sceneId: sd.sceneId,
@@ -85,18 +88,18 @@ function buildEvents(input: PhaserAdapterInput) {
         .filter((e) => e.type === "npc_dialogue")
         .map((e) => ({
           id: e.id,
-          name: findCharacterName(e.characterId, textAnalysis),
+          name: charName(e.characterId),
           x: e.x,
           y: e.y,
-          spriteColor: findCharacterColor(e.characterId, assetMapping),
+          spriteColor: charColor(e.characterId),
           dialogue: e.dialogue?.lines.map((l) => ({
-            speaker: findCharacterName(l.speakerCharacterId, textAnalysis),
+            speaker: charName(l.speakerCharacterId),
             text: l.text,
           })) ?? [],
           challenge: null,
         })),
       transfers: sd.events
-        .filter((e) => e.type === "transfer")
+        .filter((e) => e.type === "transfer" && e.transfer)
         .map((e) => ({
           id: e.id,
           x: e.x,
@@ -111,23 +114,8 @@ function buildEvents(input: PhaserAdapterInput) {
   };
 }
 
-function buildVocabulary(analysis: TextAnalysis) {
-  // Future: extract vocabulary from analysis.learningElements
+function buildVocabulary() {
   return { vocabulary: [] };
-}
-
-// ---- Helpers ----
-
-function findCharacterName(characterId: string | undefined, analysis: TextAnalysis): string {
-  if (!characterId) return "???";
-  const char = analysis.characters.find((c) => c.id === characterId);
-  return char?.name ?? characterId;
-}
-
-function findCharacterColor(characterId: string | undefined, assetMapping: PhaserAssetMapping): string {
-  if (!characterId) return "#999999";
-  const asset = assetMapping.characters.find((c) => c.characterId === characterId);
-  return asset?.spriteColor ?? "#999999";
 }
 
 function copyDirSync(src: string, dest: string): void {

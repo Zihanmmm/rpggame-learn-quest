@@ -1,11 +1,12 @@
-import type {
-  TextAnalysis,
-  ScenePlan,
-  SceneMeta,
-  SceneDetail,
-  PhaserAssetMapping,
-  PhaserCharacterAsset,
-  PhaserMapData,
+import {
+  type TextAnalysis,
+  type ScenePlan,
+  type SceneMeta,
+  type SceneDetail,
+  type PhaserAssetMapping,
+  type PhaserCharacterAsset,
+  type PhaserMapData,
+  SCENE_SIZE_DIMENSIONS,
 } from "@/pipeline/types";
 
 // ---- Character color palette ----
@@ -15,14 +16,6 @@ const CHARACTER_COLORS = [
   "#9b59b6", "#e67e22", "#1abc9c", "#e74c3c",
   "#3498db", "#2ecc71", "#f39c12", "#8e44ad",
 ];
-
-// ---- Scene size mappings ----
-
-const SCENE_SIZES: Record<string, { w: number; h: number }> = {
-  small: { w: 15, h: 12 },
-  medium: { w: 20, h: 15 },
-  large: { w: 25, h: 18 },
-};
 
 // ---- Tile constants ----
 // ground: 0=grass, 1=path, 2=wall, 3=water, 4=floor, 5=door
@@ -67,18 +60,18 @@ function generateMap(
   plan: ScenePlan,
   detail?: SceneDetail,
 ): PhaserMapData {
-  const { w, h } = SCENE_SIZES[scene.size] ?? SCENE_SIZES.medium;
+  const { w, h } = SCENE_SIZE_DIMENSIONS[scene.size] ?? SCENE_SIZE_DIMENSIONS.medium;
 
   const ground = createGrid(w, h, scene.type === "indoor" ? FLOOR : GRASS);
   const collision = createGrid(w, h, 0);
 
   if (scene.type === "indoor") {
-    generateIndoorMap(ground, collision, w, h, scene, plan, detail);
+    generateIndoorMap(ground, collision, w, h, scene, plan);
   } else {
     generateOutdoorMap(ground, collision, w, h, scene, plan, detail);
   }
 
-  const playerSpawn = findPlayerSpawn(ground, collision, w, h, scene, plan);
+  const playerSpawn = findPlayerSpawn(ground, w, h, scene, plan);
 
   return {
     sceneId: scene.id,
@@ -173,7 +166,6 @@ function generateIndoorMap(
   h: number,
   scene: SceneMeta,
   plan: ScenePlan,
-  _detail?: SceneDetail,
 ): void {
   // 1. Fill border with wall
   for (let x = 0; x < w; x++) {
@@ -227,7 +219,6 @@ function placeTransferDoors(
 
 function findPlayerSpawn(
   ground: number[][],
-  collision: number[][],
   w: number,
   h: number,
   scene: SceneMeta,

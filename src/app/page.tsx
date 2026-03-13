@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { STAGE_LABELS } from "@/pipeline/types";
 
 interface Project {
   id: string;
@@ -12,18 +13,6 @@ interface Project {
   created_at: string;
   updated_at: string;
 }
-
-const STAGE_LABELS: Record<string, string> = {
-  section_splitting: "章节拆分",
-  text_analysis: "文本分析",
-  game_design: "游戏设计",
-  scene_planning: "场景规划",
-  scene_building: "场景构建",
-  phaser_asset_mapper: "地图生成",
-  phaser_adapter: "工程生成",
-  complete: "已完成",
-  error: "出错",
-};
 
 const STATUS_STYLES: Record<string, string> = {
   idle: "bg-gray-200 text-gray-600",
